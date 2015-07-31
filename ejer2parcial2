@@ -1,0 +1,95 @@
+#include "stdafx.h"
+#include "conio.h"
+#include "iostream"
+#include "iomanip"
+using namespace std;
+#define max 30
+
+struct matriz
+{
+	int subvec[max];
+};
+
+void cargar(matriz mat[max][max],int n)
+{
+	int i,j,k;
+	cout<<"\nCargar matriz de vectores";
+	cout<<"\n-------------------------\n";
+	for(i=0;i<n;i++)
+		{for(j=0;j<n;j++)
+			{for(k=0;k<n;k++)
+				{cout<<"\nMat["<<i<<"]["<<j<<"]Vec["<<k<<"]= ";
+				cin>>mat[i][j].subvec[k];
+				}
+			}
+		}
+}
+
+void mostrar(matriz mat[max][max],int n)
+{
+	int i,j,k;
+	cout<<"\nMostrar matriz de vectores";
+	cout<<"\n-------------------------\n";
+	for(i=0;i<n;i++)
+		{for(j=0;j<n;j++)
+			{for(k=0;k<n;k++)
+				{cout<<mat[i][j].subvec[k]<<" ";
+				}
+			
+			cout <<"   \n";
+			
+			}
+			cout<<endl;
+		}
+}
+
+void ordenarVector(int vec[max],int n)
+{int i,j,aux;
+ for(i=0;i<n-1;i++)
+ {for(j=i+1;j<n;j++)
+  {if(vec[i]>vec[j])
+   {aux=vec[j];
+	vec[j]=vec[i];
+	vec[i]=aux;
+   }
+  }
+ }
+}
+
+void OrdenarAscXFila(matriz mat[max][max], int n)
+{int i,j,vec[max];
+ for(i=0;i<n;i++)
+	{for(j=0;j<n;j++)
+	 {
+		  ordenarVector(mat[i][j].subvec,n);
+	 }
+	}
+}
+
+void main()
+{
+	int n,op,vec[max];
+	matriz mat[max][max];
+	do
+	{
+	cout<<"\n\tMATRIZ DE VECTORES";
+	cout<<"\n\t------------------\n";
+	cout<<"\n1.- Cargar";
+	cout<<"\n2.- Mostrar";
+	cout<<"\n3.- Ordenar";
+	cout<<"\n0.- Salir";
+	cout<<"\nSeleccione una opcion: ";
+	cin>>op;
+	switch(op)
+	{
+	case 1: cout<<"\nIngrese el tamanho cuadrado de la matriz";
+			cin>>n;
+			cargar(mat,n);
+			break;
+	case 2: mostrar(mat,n);
+			break;
+	case 3: OrdenarAscXFila(mat,n);
+			break;
+	}
+	}while(op!=0);
+}
