@@ -1,0 +1,2738 @@
+#include "stdfx.h"
+#include "stdlib.h"
+#include "iomanip"
+#include "conio.h"
+#include "stdio.h"
+#include <string>
+#include "iostream"
+#define max 30
+
+using namespace std;
+
+void Bienvenido();
+void ingresarSistemas();
+void menuSistemas();
+void ingresarEncargadoDeVenta();
+void menuEncargadoDeVentas();
+void ingresarGerente();
+void menuGerente();
+void submenuSistemasProducto();
+void submenuSistemasAlmacen();
+void submenuSistemasUnidadDeNegocio();
+void submenuSistemasUsuario();
+void submenuSistemasVenta();
+void subsubmenuSistemasContrasenha();
+void submenuEncargadoDeVentasRegistrar();
+void subsubmenuSistemasContrasenhaEncargadoDeVenta();
+void subsubmenuSistemasContrasenhaGerente();
+void despedida();
+
+/*struct usuario
+{
+	char nombre[max];
+	char empresa[max];
+	char contrasena[max];
+	char estado;
+};
+*/
+struct producto
+{
+	int codigo;
+	char descripcion[max];
+	float costo;
+	float precio;
+	char un[max];
+	char estado;
+	int codigoalmacen;
+};
+struct almacen
+{
+	int codigo;
+	char estado;
+};
+struct un
+{
+	int codigo;
+	char descripcion[max];
+	char estado;
+};
+struct venta
+{
+	int codigoproducto;
+	int codigoalmacen;
+	char un[max];
+	float ventaacumulada;
+	char estado;
+	int fechaanho;
+	int cantidad;
+};
+struct pronostico
+{
+	float proyeccion;
+	char estado;
+};
+struct encargadodeventascontrasenha
+{
+	char contrasenha[max];
+	char estado;
+};
+struct gerentecontrasenha
+{
+	char contrasenha[max];
+	char estado;
+};
+
+
+producto ObtCodigoProducto(int n)
+{
+	FILE *ptr;
+	producto regP;
+	ptr = fopen("producto.dat", "rb");
+	if (ptr != NULL)
+	{
+		fread(&regP, sizeof(regP), 1, ptr);
+		while ((!feof(ptr) == false) && (regP.codigo != n))
+		{
+			fread(&regP, sizeof(ptr), 1, ptr);
+		}
+		fclose(ptr);
+		return(regP);
+	}
+}
+almacen ObtCodigoAlmacen(int n)
+{
+	FILE *ptr;
+	almacen regA;
+	ptr = fopen("almacen.dat", "rb");
+	if (ptr != NULL)
+	{
+		fread(&regA, sizeof(regA), 1, ptr);
+		while ((!feof(ptr) == false) && (regA.codigo != n))
+		{
+			fread(&regA, sizeof(ptr), 1, ptr);
+		}
+		fclose(ptr);
+		return(regA);
+	}
+}
+un ObtUnidadDeNegocio(char n[])
+{
+	FILE *ptr;
+	un regU;
+	ptr = fopen("unidaddenegocio.dat", "rb");
+	if (ptr != NULL)
+	{
+		fread(&regU, sizeof(regU), 1, ptr);
+		while ((!feof(ptr) == false) && ((strcmp(regU.descripcion,n)!=0)))
+		{
+			fread(&regU, sizeof(ptr), 1, ptr);
+		}
+		fclose(ptr);
+		return(regU);
+	}
+}
+
+bool verificarCodigoProducto(int x)
+{
+	bool ban = false;
+	FILE *ptr;
+	producto reg;
+	ptr = fopen("producto.dat", "rb");
+	if (ptr == NULL)
+	{
+		cout << "Archivo no Existe";
+	}
+	else{
+		fread(&reg, sizeof(reg), 1, ptr);
+		while (!feof(ptr))
+		{
+			if (reg.codigo == x)
+			{
+				ban = true;
+			}
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		fclose(ptr);
+	}
+	return(ban);
+}
+bool verificarCodigoAlmacen(int x)
+{
+	bool ban = false;
+	FILE *ptr;
+	almacen reg;
+	ptr = fopen("almacen.dat", "rb");
+	if (ptr == NULL)
+	{
+		cout << "Archivo no Existe";
+	}
+	else{
+		fread(&reg, sizeof(reg), 1, ptr);
+		while (!feof(ptr))
+		{
+			if (reg.codigo == x)
+			{
+				ban = true;
+			}
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		fclose(ptr);
+	}
+	return(ban);
+}
+bool verificarUnidadDeNegocio(char x[])
+{
+	bool ban = false;
+	FILE *ptr;
+	un reg;
+	ptr = fopen("unidaddenegocio.dat", "rb");
+	if (ptr == NULL)
+	{
+		cout << "Archivo no Existe";
+	}
+	else{
+		fread(&reg, sizeof(reg), 1, ptr);
+		while (!feof(ptr))
+		{
+			if (strcmp(reg.descripcion,x)==0)
+			{
+				ban = true;
+			}
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		fclose(ptr);
+	}
+	return(ban);
+}
+bool verificarEncargadoDeVentaContrasenha(char x[])
+{
+	bool ban = false;
+	FILE *ptr;
+	encargadodeventascontrasenha reg;
+	ptr = fopen("encargadodeventacontrasenha.dat", "rb");
+	if (ptr == NULL)
+	{
+		cout << "Archivo no Existe";
+	}
+	else{
+		fread(&reg, sizeof(reg), 1, ptr);
+		while (!feof(ptr))
+		{
+			if (strcmp(reg.contrasenha, x) == 0)
+			{
+				ban = true;
+			}
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		fclose(ptr);
+	}
+	return(ban);
+}
+bool verificarGerenteContrasenha(char x[])
+{
+	bool ban = false;
+	FILE *ptr;
+	encargadodeventascontrasenha reg;
+	ptr = fopen("gerentecontrasenha.dat", "rb");
+	if (ptr == NULL)
+	{
+		cout << "Archivo no Existe";
+	}
+	else{
+		fread(&reg, sizeof(reg), 1, ptr);
+		while (!feof(ptr))
+		{
+			if (strcmp(reg.contrasenha, x) == 0)
+			{
+				ban = true;
+			}
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		fclose(ptr);
+	}
+	return(ban);
+}
+
+int calculoProyeccionA()
+{
+	FILE *ptr;
+	venta reg;
+	int may = 0, c = 0, p = 1;
+	float sumx = 0, sumy = 0, sumxy = 0, sumxx = 0, a, b;
+
+
+	ptr = fopen("venta.dat", "rb");
+	if (ptr != NULL)
+	{
+		fread(&reg, sizeof(reg), 1, ptr);
+		while (feof(ptr) == false)
+		{
+			if (reg.estado == 'S')
+			{
+				c++;
+			}
+			fread(&reg, sizeof(reg), 1, ptr);
+
+		}
+		rewind(ptr); //Vuelve al inicio el puntero
+		fread(&reg, sizeof(reg), 1, ptr);
+		while ((feof(ptr) == false) && (p <= c))
+		{
+			sumx = sumx + p;
+			sumy = sumy + reg.ventaacumulada;
+			sumxy = sumxy + (reg.ventaacumulada*c);
+			sumxx = sumxx + (p*p);
+			p++;
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		b = ((c*sumxy) - (sumx*sumy)) / ((c*sumxx) - (sumx*sumx));
+		a = ((sumy - (b*sumx)) / c);
+
+
+	}
+	else{
+		cout << "El archivo no existe" << endl;
+	}
+	fclose(ptr);
+	return(a);
+}
+int calculoProyeccionB()
+{
+	FILE *ptr;
+	venta reg;
+	int may = 0, c = 0, p = 1;
+	float sumx = 0, sumy = 0, sumxy = 0, sumxx = 0, a, b;
+
+
+	ptr = fopen("venta.dat", "rb");
+	if (ptr != NULL)
+	{
+		fread(&reg, sizeof(reg), 1, ptr);
+		while (feof(ptr) == false)
+		{
+			if (reg.estado == 'S')
+			{
+				c++;
+			}
+			fread(&reg, sizeof(reg), 1, ptr);
+
+		}
+		rewind(ptr); //Vuelve al inicio el puntero
+		fread(&reg, sizeof(reg), 1, ptr);
+		while ((feof(ptr) == false) && (p <= c))
+		{
+			sumx = sumx + p;
+			sumy = sumy + reg.ventaacumulada;
+			sumxy = sumxy + (reg.ventaacumulada*c);
+			sumxx = sumxx + (p*p);
+			p++;
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		b = ((c*sumxy) - (sumx*sumy)) / ((c*sumxx) - (sumx*sumx));
+		a = (sumy - b*sumx) / c;
+
+
+	}
+	else{
+		cout << "El archivo no existe" << endl;
+	}
+	fclose(ptr);
+	return(b);
+}
+
+int calculoPorcentajeB()
+{
+	FILE*ptr;
+	venta reg;
+	int may = 0;
+	float sumx = 0, sumy = 0, sumxy = 0, sumxs = 0, a, b;
+
+
+	ptr = fopen("venta.dat", "rb");
+	if (ptr != NULL)
+	{
+		fread(&reg, sizeof(reg), 1, ptr);
+		while (feof(ptr) == false)
+		{
+			if (reg.fechaanho>may)
+			{
+				may = reg.fechaanho;
+				fread(&reg, sizeof(reg), 1, ptr);
+			}
+
+		}
+		fseek(ptr, 0, SEEK_SET);
+		fread(&reg, sizeof(reg), 1, ptr);
+		while (feof(ptr) == false)
+		{
+			sumx = sumx + reg.fechaanho;
+			sumy = sumy + reg.ventaacumulada;
+			sumxy = sumxy + (reg.ventaacumulada*reg.fechaanho);
+			sumxs = sumxs + (reg.fechaanho*reg.fechaanho);
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		b = ((may*sumxy) - (sumx*sumy)) / (may*sumxs - (sumx*sumx));
+		a = (sumy - b*sumx) / may;
+
+
+	}
+	else{
+		cout << "El archivo no existe" << endl;
+	}
+	fclose(ptr);
+	return(b);
+}
+int calculoPorcentajeMay()
+{
+	FILE*ptr;
+	venta reg;
+	int may = 0;
+	float sumx = 0, sumy = 0, sumxy = 0, sumxs = 0, a, b;
+
+
+	ptr = fopen("venta.dat", "rb");
+	if (ptr != NULL)
+	{
+		fread(&reg, sizeof(reg), 1, ptr);
+		while (feof(ptr) == false)
+		{
+			if (reg.fechaanho>may)
+			{
+				may = reg.fechaanho;
+				fread(&reg, sizeof(reg), 1, ptr);
+			}
+
+		}
+		fseek(ptr, 0, SEEK_SET);
+		fread(&reg, sizeof(reg), 1, ptr);
+		while (feof(ptr) == false)
+		{
+			sumx = sumx + reg.fechaanho;
+			sumy = sumy + reg.ventaacumulada;
+			sumxy = sumxy + (reg.ventaacumulada*reg.fechaanho);
+			sumxs = sumxs + (reg.fechaanho*reg.fechaanho);
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		b = ((may*sumxy) - (sumx*sumy)) / (may*sumxs - (sumx*sumx));
+		a = (sumy - b*sumx) / may;
+
+
+	}
+	else{
+		cout << "El archivo no existe" << endl;
+	}
+	fclose(ptr);
+	return(may);
+}
+int calculoPorcentajeSumy()
+{
+	FILE*ptr;
+	venta reg;
+	int may = 0;
+	float sumx = 0, sumy = 0, sumxy = 0, sumxs = 0, a, b;
+
+
+	ptr = fopen("venta.dat", "rb");
+	if (ptr != NULL)
+	{
+		fread(&reg, sizeof(reg), 1, ptr);
+		while (feof(ptr) == false)
+		{
+			if (reg.fechaanho>may)
+			{
+				may = reg.fechaanho;
+				fread(&reg, sizeof(reg), 1, ptr);
+			}
+
+		}
+		fseek(ptr, 0, SEEK_SET);
+		fread(&reg, sizeof(reg), 1, ptr);
+		while (feof(ptr) == false)
+		{
+			sumx = sumx + reg.fechaanho;
+			sumy = sumy + reg.ventaacumulada;
+			sumxy = sumxy + (reg.ventaacumulada*reg.fechaanho);
+			sumxs = sumxs + (reg.fechaanho*reg.fechaanho);
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		b = ((may*sumxy) - (sumx*sumy)) / (may*sumxs - (sumx*sumx));
+		a = (sumy - b*sumx) / may;
+
+
+	}
+	else{
+		cout << "El archivo no existe" << endl;
+	}
+	fclose(ptr);
+	return(sumy);
+}
+
+int mostrarListaDeVentasAcumuladas()
+{
+	system("CLS");
+	int x = 1, op;
+	FILE *ptr;
+	venta reg;
+	ptr = fopen("venta.dat", "rb");
+	if (ptr == NULL)
+		cout << endl << "Archivo no Existe";
+	else
+	{
+		cout << endl << "=======================================================================";
+		cout << endl << "		Lista de Ventas Acumuladas por Anho			";
+		cout << endl << "-----------------------------------------------------------------------";
+		cout << endl << "    Anho           Venta Acumulada		";
+		cout << endl << "-----------------------------------------------------------------------";
+		fread(&reg, sizeof(reg), 1, ptr);
+		while (!feof(ptr))
+		{
+			if (reg.estado == 'S')
+			{
+				cout << endl << setw(8) << x << setw(8) << "|" << setw(10) << reg.ventaacumulada;
+				x++;
+			}
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		fclose(ptr);
+		cout << endl << "=======================================================================";
+
+	}
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		menuGerente();
+	else
+		despedida();
+
+	return(x);
+
+
+}
+int mostrarListaDeVentasAcumuladasA()
+{
+	system("CLS");
+	int x = 0, op;
+	FILE *ptr;
+	venta reg;
+	ptr = fopen("venta.dat", "rb");
+	if (ptr == NULL)
+		cout << endl << "Archivo no Existe";
+	else
+	{
+
+		fread(&reg, sizeof(reg), 1, ptr);
+		while (!feof(ptr))
+		{
+			if (reg.estado == 'S')
+			{
+				x++;
+			}
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		fclose(ptr);
+		return(x);
+	}
+
+}
+
+
+void porcentaje(float b, int may, float sumy)
+{
+	float c;
+	int op;
+	system("CLS");
+
+	c = ((b*may) / sumy) * 100;
+	cout << "\n\nEl Pronostico es: " << c;
+	cout << "\n\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		menuGerente();
+	else
+		despedida();
+
+}
+void proyeccion(float a, float b, int nro)
+{
+
+	FILE *ptr;
+	pronostico reg;
+	int x, c = 1, i, op;
+	system("CLS");
+	ptr = fopen("proyeccion.dat", "ab");
+
+	cout << "\n\tProyeccion de Ventas";
+	cout << "\n\t--------------------\n";
+	cout << "\nIngrese el periodo para el cual quiere realizar una proyeccion" << endl;
+	do
+	{
+		cin >> x;
+	} while (x <= 0);
+	i = nro;
+	while (i <= x + nro - 1)
+	{
+		reg.proyeccion = a + b*i;
+		fwrite(&reg, sizeof(reg), 1, ptr);
+		i++;
+	}
+
+	fclose(ptr);
+
+
+
+}
+
+void reportePronostico(int n)
+{
+
+
+	FILE *ptr;
+	pronostico reg;
+	int op, x = n + 1;
+	system("CLS");
+	ptr = fopen("proyeccion.dat", "rb");
+	if (ptr == NULL)
+		cout << endl << "Archivo no Existe";
+	else
+	{
+
+		cout << endl << "=======================================================================";
+		cout << endl << "		Reporte del Archivo Proyeccion			";
+		cout << endl << "-----------------------------------------------------------------------";
+		cout << endl << "  Anho          Venta Acumulada		";
+		cout << endl << "-----------------------------------------------------------------------";
+		fread(&reg, sizeof(reg), 1, ptr);
+		while (!feof(ptr))
+		{
+
+			cout << endl << setw(8) << x << setw(15) << reg.proyeccion;
+			x++;
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		fclose(ptr);
+		cout << endl << "=======================================================================";
+	}
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		menuGerente();
+	else
+		despedida();
+}
+
+void creararchivoProducto()
+{
+	FILE *ptr;
+	ptr = fopen("producto.dat", "wb");
+	fclose(ptr);
+}
+void creararchivoAlmacen()
+{
+	FILE *ptr;
+	ptr = fopen("almacen.dat", "wb");
+	fclose(ptr);
+}
+void creararchivoUnidaddeNegocio()
+{
+	FILE *ptr;
+	ptr = fopen("unidaddenegocio.dat", "wb");
+	fclose(ptr);
+}
+/*void creararchivoUsuario()
+{
+	FILE *ptr;
+	ptr = fopen("usuario.dat", "wb");
+	fclose(ptr);
+}
+*/
+void creararchivoVenta()
+{
+	FILE *ptr;
+	ptr = fopen("ventas.dat", "wb");
+	fclose(ptr);
+}
+void creararchivoProyeccion()
+{
+	FILE *ptr;
+	ptr = fopen("proyeccion.dat", "wb");
+	fclose(ptr);
+}
+void creararchivoEncargadoDeVentaContraseña()
+{
+	FILE *ptr;
+	ptr = fopen("encargadodeventacontrasenha.dat", "wb");
+	fclose(ptr);
+}
+void creararchivoGerenteContraseña()
+{
+	FILE *ptr;
+	ptr = fopen("gerentecontrasenha.dat", "wb");
+	fclose(ptr);
+}
+
+
+/*void registrarUsuario()
+{
+	system("CLS");
+	usuario reg;
+	FILE *ptr;
+	int op;
+	ptr = fopen("usuario.dat", "ab");
+	do
+	{
+		cout << "\n\tRegristrar Usuario\n";
+		cout << "\nIngrese nombre de usuario: ";
+		do{
+			gets(reg.nombre);
+		} while (strlen(reg.nombre) == 0);
+		cout << "\nIngrese nombre de empresa: ";
+		do{
+			gets(reg.empresa);
+		} while (strlen(reg.empresa) == 0);
+		cout << "\n Ingrese contrasena: ";
+		do{
+			gets(reg.contrasena);
+		} while (strlen(reg.contrasena) == 0);
+		reg.estado = 'S';
+		fwrite(&reg, sizeof(reg), 1, ptr);
+		cout << "Adicionar otro usuario:" << endl << "si=1" << "\nno=0\n";
+		cin >> op;
+	} while (op == 1);
+	fclose(ptr);
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		submenuSistemasProducto();
+	else
+		despedida();
+}
+*/
+void registrarProducto()
+{
+	system("CLS");
+	producto reg;
+	almacen regA;
+	FILE *ptr;
+	int op;
+	bool l = false, m = false;
+	ptr = fopen("producto.dat", "ab");
+	do
+	{
+		cout << "\n\tRegristrar Producto";
+		cout << "\n\t-------------------\n";
+		cout << "\nIngrese el codigo: ";
+		cin >> reg.codigo;
+		cout << "\nIngrese la descripcion: ";
+		do{
+			gets(reg.descripcion);
+		} while (strlen(reg.descripcion) == 0);
+		cout << "\nIngrese el costo: ";
+		cin >> reg.costo;
+		cout << "\nIngrese el precio: ";
+		cin >> reg.precio;
+		cout << "\nIngrese unidad de negocio: ";
+		do
+		{
+			do
+			{
+				gets(reg.un);
+			} while (strlen(reg.un) == 0);
+			if (verificarUnidadDeNegocio(reg.un) == false)
+				cout << "\n\nLa Unidad de Negocio es Incorrecta\nDigite la Unidad de Negocio de Nuevo:";
+			else
+				m = true;
+		} while (m == false);
+		cout << "\nIngrese codigo del almacen: ";
+		do{
+			cin>>reg.codigoalmacen;
+			if (verificarCodigoAlmacen(reg.codigoalmacen) == false)
+				cout << "\n\nEl codigo es Incorrecto\nDigite el Codigo del Almacen de Nuevo:";
+			else
+				l = true;
+		} while (l==false);
+		reg.estado = 'S';
+		fwrite(&reg, sizeof(reg), 1, ptr);
+		cout << "Adicionar otro producto:" << endl << "si=1" << "\nno=0\n";
+		cin >> op;
+	} while (op == 1);
+	fclose(ptr);
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin>>op;
+	if (op == 1)
+		submenuSistemasProducto();
+	else
+	despedida();
+	
+}
+void registrarAlmacen()
+{
+	system("CLS");
+	almacen reg;
+	FILE *ptr;
+	int op;
+	ptr = fopen("almacen.dat", "ab");
+	do
+	{
+		cout << "\n\tRegristrar Almacen\n";
+		cout << "\nIngrese el codigo: ";
+		cin >> reg.codigo;
+		reg.estado = 'S';
+		fwrite(&reg, sizeof(reg), 1, ptr);
+		cout << "Adicionar otro almacen:" << endl << "si=1" << "\nno=0\n";
+		cin >> op;
+	} while (op == 1);
+	fclose(ptr);
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		submenuSistemasAlmacen();
+	else
+		despedida();
+}
+void registrarUnidadDeNegocio()
+{
+	system("CLS");
+	un reg;
+	FILE *ptr;
+	int op;
+	ptr = fopen("unidaddenegocio.dat", "ab");
+	do
+	{
+		cout << "\n\tRegristrar Unidad de Negocio\n";
+		cout << "\nIngrese el codigo: ";
+		cin >> reg.codigo;
+		cout << "\nIngrese la descripcion: ";
+		do{
+			gets(reg.descripcion);
+		} while (strlen(reg.descripcion) == 0);
+		reg.estado = 'S';
+		fwrite(&reg, sizeof(reg), 1, ptr);
+		cout << "Adicionar otra unidad de negocio:" << endl << "si=1" << "\nno=0\n";
+		cin >> op;
+	} while (op == 1);
+	fclose(ptr);
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		submenuSistemasUnidadDeNegocio();
+	else
+		despedida();
+}
+void registrarVenta()
+{
+	system("CLS");
+	venta reg;
+	FILE *ptr;
+	int op;
+	ptr = fopen("venta.dat", "ab");
+	do
+	{
+		cout << "\n\tRegristrar Venta\n";
+		cout << "\nIngrese el codigo del producto: ";
+		cin >> reg.codigoproducto;
+		cout << "\nIngrese codigo del almacen: ";
+		cin >> reg.codigoalmacen;
+		cout << "\nIngrese la unidad de negocio: ";
+		do{
+			gets(reg.un);
+		} while (strlen(reg.un) == 0);
+		cout << "\nIngrese venta acumulada: ";
+		cin >> reg.ventaacumulada;
+		reg.estado = 'S';
+		fwrite(&reg, sizeof(reg), 1, ptr);
+		cout << "Adicionar otra venta acumulada:" << endl << "si=1" << "\nno=0\n";
+		cin >> op;
+	} while (op == 1);
+	fclose(ptr);
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		submenuSistemasProducto();
+	else
+		despedida();
+}
+void registrarEncargadoDeVentaContrasenha()
+{
+	system("CLS");
+	encargadodeventascontrasenha reg;
+	FILE *ptr;
+	int op;
+	bool k = false;
+	ptr = fopen("encargadodeventacontrasenha.dat", "ab");
+	do
+	{
+		cout << "\n\tRegristrar Contrasenha para Encargado de Ventas";
+		cout << "\n\t-----------------------------------------------\n";
+		cout << "\nIngrese contrasenha: ";
+		do{
+			gets(reg.contrasenha);
+		} while (strlen(reg.contrasenha)==0);
+		reg.estado = 'S';
+		fwrite(&reg,sizeof(reg),1,ptr);
+		cout << "Adicionar otra contrasenha?" << endl << "si=1" << "\nno=0\n";
+		cin >> op;
+	} while (op == 1);
+	fclose(ptr);
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		subsubmenuSistemasContrasenhaEncargadoDeVenta();
+	else
+		despedida();
+}
+void registrarGerenteContrasenha()
+{
+	system("CLS");
+	gerentecontrasenha reg;
+	FILE *ptr;
+	int op;
+	bool k = false;
+	ptr = fopen("gerentecontrasenha.dat", "ab");
+	do
+	{
+		cout << "\n\tRegristrar Contrasenha para Gerente";
+		cout << "\n\t-----------------------------------\n";
+		cout << "\nIngrese contrasenha: ";
+		do{
+			gets(reg.contrasenha);
+		} while (strlen(reg.contrasenha) == 0);
+		reg.estado = 'S';
+		fwrite(&reg, sizeof(reg), 1, ptr);
+		cout << "Adicionar otra contrasenha?" << endl << "si=1" << "\nno=0\n";
+		cin >> op;
+	} while (op == 1);
+	fclose(ptr);
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		subsubmenuSistemasContrasenhaGerente();
+	else
+		despedida();
+}
+
+/*void modificarUsuario()
+{
+	system("CLS");
+	FILE *ptr;
+	usuario reg;
+	int nro, op;
+	ptr = fopen("usuario.dat", "r+b");
+	if (ptr == NULL)
+		cout << "\nEl Archivo no existe";
+	else
+	{
+		do
+		{
+			cout << "\nIngrese el nro de registro a modificar :\n";
+			cin >> nro;
+			fseek(ptr, sizeof(reg)*(nro - 1), SEEK_SET);
+			fread(&reg, sizeof(reg), 1, ptr);
+			if (feof(ptr) != false)
+				cout << "\nEl registro no existe";
+			else
+			{
+				cout << "\nModificar el nombre?? Si = 1 -- No = 0 ";
+				cin >> op;
+				if (op == 1)
+				{
+
+					cout << "\nIngrese el nuevo nombre:";
+					do{
+						gets(reg.nombre);
+					} while (strlen(reg.nombre) == 0);
+
+				}
+				cout << "\nModificar contraseña?? Si = 1 -- No = 0 ";
+				cin >> op;
+				if (op == 1)
+				{
+					cout << "\nIngrese la nueva Contrasena:";
+					do{
+						gets(reg.contrasena);
+					} while (strlen(reg.contrasena) == 0);
+
+				}
+				cout << "\nModificar Empresa?? Si = 1 -- No = 0 ";
+				cin >> op;
+				if (op == 1)
+				{
+					cout << "\nIngrese la nueva Empresa:";
+					do{
+						gets(reg.empresa);
+					} while (strlen(reg.empresa) == 0);
+				}
+
+				fseek(ptr, sizeof(reg)*(nro - 1), SEEK_SET);
+				fwrite(&reg, sizeof(reg), 1, ptr);
+			}
+			cout << "\nDesea modificar otro registro de un producto??? Si=1 -- No=0\n";
+			cin >> op;
+		} while (op == 1);
+	}
+	fclose(ptr);
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		submenuSistemasProducto();
+	else
+		despedida();
+}
+*/
+void modificarProducto()
+{
+	system("CLS");
+	FILE *ptr;
+	producto reg;
+	int nro, op,x=1;
+	ptr = fopen("producto.dat", "r+b");
+	if (ptr == NULL)
+		cout << "\nEl Archivo no existe";
+	else
+	{
+		do
+		{
+			cout << endl << "=======================================================================";
+			cout << endl << "		Reporte del Archivo Producto			";
+			cout << endl << "-----------------------------------------------------------------------";
+			cout << endl << "  Codigo  Descripcion	costo	Precio  Unidad de Negocio   Almacen		";
+			cout << endl << "-----------------------------------------------------------------------";
+			fread(&reg, sizeof(reg), 1, ptr);
+			while (!feof(ptr))
+			{
+				if (reg.estado == 'S')
+				{
+					cout << endl << x << setw(5) << reg.codigo << setw(14) << reg.descripcion << setw(8) << reg.costo << setw(8) << reg.precio << setw(10) << reg.un <<setw(18) << reg.codigoalmacen;
+					x++;
+				}
+				fread(&reg, sizeof(reg), 1, ptr);
+			}
+			cout << endl << "=======================================================================";
+			cout << "\nIngrese el nro de producto a modificar :\n";
+			cin >> nro;
+			fseek(ptr, sizeof(reg)*(nro - 1), SEEK_SET);
+			fread(&reg, sizeof(reg), 1, ptr);
+			if (feof(ptr) != false)
+				cout << "\nEl registro no existe";
+			else
+			{
+				cout << "\n\nModificar el codigo?? Si = 1 -- No = 0\nDigite opcion:";
+				cin >> op;
+				if (op == 1)
+				{
+
+					cout << "\nIngrese el nuevo codigo:";
+					cin >> reg.codigo;
+
+				}
+				cout << "\nModificar la descripcion?? Si = 1 -- No = 0\nDigite opcion:";
+				cin >> op;
+				if (op == 1)
+				{
+					do{
+						cout << "\nIngrese la nueva descripcion:";
+						do{
+							gets(reg.descripcion);
+						} while (strlen(reg.descripcion) == 0);
+					} while (strlen(reg.descripcion)==0);
+				}
+				cout << "\nModificar costo?? Si = 1 -- No = 0\nDigite opcion:";
+				cin >> op;
+				if (op == 1)
+				{
+					cout << "\nIngrese el nuevo costo:";
+					cin >> reg.costo;
+
+				}
+				cout << "\nModificar precio?? Si = 1 -- No = 0\nDigite opcion:";
+				cin >> op;
+				if (op == 1)
+				{
+					cout << "\nIngrese el nuevo precio:";
+					cin >> reg.precio;
+
+				}
+				
+
+				cout << "\nModificar la Unidad de Negocio?? Si = 1 -- No = 0\nDigite opcion:";
+				cin >> op;
+				if (op == 1)
+				{
+
+					cout << "\nIngrese la nueva Unidad de Negocio:";
+					do{
+						gets(reg.un);
+					} while (strlen(reg.un) == 0);
+
+				}
+
+				fseek(ptr, sizeof(reg)*(nro - 1), SEEK_SET);
+				fwrite(&reg, sizeof(reg), 1, ptr);
+			}
+			cout << "\nDesea modificar otro registro de un producto??? Si=1 -- No=0\n";
+			cin >> op;
+		} while (op == 1);
+	}
+	fclose(ptr);
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		submenuSistemasProducto();
+	else
+		despedida();
+}
+void modificarAlmacen()
+{
+	system("CLS");
+	FILE *ptr;
+	almacen reg;
+	int nro, op,x=1;
+	ptr = fopen("almacen.dat", "r+b");
+	if (ptr == NULL)
+		cout << "\nEl Archivo no existe";
+	else
+	{
+		do
+		{
+			cout << endl << "=======================================================================";
+			cout << endl << "		Reporte del Archivo Almacen			";
+			cout << endl << "-----------------------------------------------------------------------";
+			cout << endl << "    Codigo  		";
+			cout << endl << "-----------------------------------------------------------------------";
+			fread(&reg, sizeof(reg), 1, ptr);
+			while (!feof(ptr))
+			{
+				if (reg.estado == 'S')
+				{
+					cout << endl << x << setw(8) << reg.codigo;
+					x++;
+				}
+				fread(&reg, sizeof(reg), 1, ptr);
+			}
+			cout << endl << "=======================================================================";
+			cout << "\n\nIngrese el nro de almacen a modificar :\n";
+			cin >> nro;
+			fseek(ptr, sizeof(reg)*(nro - 1), SEEK_SET);
+			fread(&reg, sizeof(reg), 1, ptr);
+			if (feof(ptr) != false)
+				cout << "\nEl registro no existe";
+			else
+			{
+				cout << "\nModificar el codigo?? Si = 1 -- No = 0 ";
+				cin >> op;
+				if (op == 1)
+				{
+
+					cout << "\nIngrese el nuevo codigo:";
+					cin >> reg.codigo;
+
+				}
+				
+
+				fseek(ptr, sizeof(reg)*(nro - 1), SEEK_SET);
+				fwrite(&reg, sizeof(reg), 1, ptr);
+			}
+			cout << "\nDesea modificar otro registro de un almacen??? Si=1 -- No=0\n";
+			cin >> op;
+		} while (op == 1);
+	}
+	fclose(ptr);
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		submenuSistemasProducto();
+	else
+		despedida();
+}
+void modificarUnidadDeNegocio()
+{
+	system("CLS");
+	FILE *ptr;
+	un reg;
+	int nro, op,x=1;
+	ptr = fopen("unidaddenegocio.dat", "r+b");
+	if (ptr == NULL)
+		cout << "\nEl Archivo no existe";
+	else
+	{
+		do
+		{
+			cout << endl << "=======================================================================";
+			cout << endl << "		Reporte del Archivo Unidad de Negocio			";
+			cout << endl << "-----------------------------------------------------------------------";
+			cout << endl << "  Codigo   Descripcion 		";
+			cout << endl << "-----------------------------------------------------------------------";
+			fread(&reg, sizeof(reg), 1, ptr);
+			while (!feof(ptr))
+			{
+				if (reg.estado == 'S')
+				{
+					cout << endl << x << setw(5) << reg.codigo << setw(12) << reg.descripcion;
+					x++;
+				}
+				fread(&reg, sizeof(reg), 1, ptr);
+			}
+			cout << endl << "=======================================================================";
+			cout << "\n\nIngrese el nro de unidad de negocio a modificar:\n";
+			cin >> nro;
+			fseek(ptr, sizeof(reg)*(nro - 1), SEEK_SET);
+			fread(&reg, sizeof(reg), 1, ptr);
+			if (feof(ptr) != false)
+				cout << "\nEl registro no existe";
+			else
+			{
+				cout << "\nModificar el codigo?? Si = 1 -- No = 0 ";
+				cin >> op;
+				if (op == 1)
+				{
+
+					cout << "\nIngrese el nuevo codigo:";
+					cin >> reg.codigo;
+
+				}
+
+				cout << "\nModificar la descripcion?? Si = 1 -- No = 0 ";
+				cin >> op;
+				if (op == 1)
+				{
+
+					cout << "\nIngrese la nueva descripcion:";
+					do
+					{
+						gets(reg.descripcion);
+					} while (strlen(reg.descripcion) == 0);
+
+				}
+
+				fseek(ptr, sizeof(reg)*(nro - 1), SEEK_SET);
+				fwrite(&reg, sizeof(reg), 1, ptr);
+			}
+			cout << "\nDesea modificar otro registro de unidad de negocio??? Si=1 -- No=0\n";
+			cin >> op;
+		} while (op == 1);
+	}
+	fclose(ptr);
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		submenuSistemasProducto();
+	else
+		despedida();
+}
+void modificarVenta()
+{
+	system("CLS");
+	FILE *ptr;
+	venta reg;
+	int nro, op,x=1;
+	ptr = fopen("venta.dat", "r+b");
+	if (ptr == NULL)
+		cout << "\nEl Archivo no existe";
+	else
+	{
+		do
+		{
+			cout << endl << "=======================================================================";
+			cout << endl << "		Reporte del Archivo Venta			";
+			cout << endl << "-----------------------------------------------------------------------";
+			cout << endl << "  Cod. Prod  Cod. Alm 	Unidad de Negocio   Cantidad     Anho		";
+			cout << endl << "-----------------------------------------------------------------------";
+			fread(&reg, sizeof(reg), 1, ptr);
+			while (!feof(ptr))
+			{
+				if (reg.estado == 'S')
+				{
+					cout << endl << x << setw(5) << reg.codigoproducto << setw(14) << reg.codigoalmacen << setw(15) << reg.un << setw(15) << reg.cantidad << setw(11) << reg.fechaanho;
+					x++;
+				}
+				fread(&reg, sizeof(reg), 1, ptr);
+			}
+			cout << endl << "=======================================================================";
+			cout << "\n\nIngrese el nro de registro a modificar :\n";
+			cin >> nro;
+			fseek(ptr, sizeof(reg)*(nro - 1), SEEK_SET);
+			fread(&reg, sizeof(reg), 1, ptr);
+			if (feof(ptr) != false)
+				cout << "\nEl registro no existe";
+			else
+			{
+				cout << "\nModificar el codigo del producto?? Si = 1 -- No = 0 ";
+				cin >> op;
+				if (op == 1)
+				{
+
+					cout << "\nIngrese el nuevo codigo del producto:";
+					cin >> reg.codigoproducto;
+
+				}
+				cout << "\nModificar el codigo del almacen?? Si = 1 -- No = 0 ";
+				cin >> op;
+				if (op == 1)
+				{
+
+					cout << "\nIngrese el nuevo codigo del almacen:";
+					cin >> reg.codigoproducto;
+
+				}
+				cout << "\nModificar la unidad de negocio?? Si = 1 -- No = 0 ";
+				cin >> op;
+				if (op == 1)
+				{
+					cout << "\nIngrese la nueva Unidad de Negocio:";
+					do{
+						gets(reg.un);
+					} while (strlen(reg.un) == 0);
+
+				}
+				cout << "\nModificar la Venta Acumulada?? Si = 1 -- No = 0 ";
+				cin >> op;
+				if (op == 1)
+				{
+					cout << "\nIngrese la Venta Acumulada:";
+					cin >> reg.ventaacumulada;
+				}
+				cout << "\nModificar el Anho?? Si = 1 -- No = 0 ";
+				cin >> op;
+				if (op == 1)
+				{
+					cout << "\nIngrese el Anho:";
+					cin >> reg.fechaanho;
+				}
+
+				fseek(ptr, sizeof(reg)*(nro - 1), SEEK_SET);
+				fwrite(&reg, sizeof(reg), 1, ptr);
+			}
+			cout << "\nDesea modificar otro registro de ventas??? Si=1 -- No=0\n";
+			cin >> op;
+		} while (op == 1);
+	}
+	fclose(ptr);
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		submenuSistemasProducto();
+	else
+		despedida();
+}
+void modificarEncargadoDeVentaContrasenha()
+{
+	system("CLS");
+	FILE *ptr;
+	encargadodeventascontrasenha reg;
+	int nro, op,x=1;
+	ptr = fopen("encargadodeventacontrasenha.dat", "r+b");
+	if (ptr == NULL)
+		cout << "\nEl Archivo no existe";
+	else
+	{
+		do
+		{
+			cout << endl << "=======================================================================";
+			cout << endl << "		Reporte de Contrasenhas del Encargado de Ventas			";
+			cout << endl << "-----------------------------------------------------------------------";
+			cout << endl << "                  Contrasenha    		";
+			cout << endl << "-----------------------------------------------------------------------";
+			fread(&reg, sizeof(reg), 1, ptr);
+			while (!feof(ptr))
+			{
+				if (reg.estado == 'S')
+				{
+					cout << endl << x << setw(25) << reg.contrasenha;
+					x++;
+				}
+				fread(&reg, sizeof(reg), 1, ptr);
+			}
+			cout << endl << "=======================================================================";
+			cout << "\n\nIngrese el nro de contrasenha a modificar :\n";
+			cin >> nro;
+			fseek(ptr, sizeof(reg)*(nro - 1), SEEK_SET);
+			fread(&reg, sizeof(reg), 1, ptr);
+			if (feof(ptr) != false)
+				cout << "\nEl registro no existe";
+			else
+			{
+				cout << "\nModificar la contrasenha?? Si = 1 -- No = 0 ";
+				cin >> op;
+				if (op == 1)
+				{
+
+					cout << "\nIngrese la nueva contrasenha:";
+					do
+					{
+						gets(reg.contrasenha);
+					} while (strlen(reg.contrasenha)==0);
+
+				}
+
+
+				fseek(ptr, sizeof(reg)*(nro - 1), SEEK_SET);
+				fwrite(&reg, sizeof(reg), 1, ptr);
+			}
+			cout << "\nDesea modificar otra contrasenha del Encargado de Ventas??? Si=1 -- No=0\n";
+			cin >> op;
+		} while (op == 1);
+	}
+	fclose(ptr);
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		subsubmenuSistemasContrasenhaEncargadoDeVenta();
+	else
+		despedida();
+}
+void modificarGerenteContrasenha()
+{
+	system("CLS");
+	FILE *ptr;
+	gerentecontrasenha reg;
+	int nro, op,x=1;
+	ptr = fopen("gerentecontrasenha.dat", "r+b");
+	if (ptr == NULL)
+		cout << "\nEl Archivo no existe";
+	else
+	{
+		do
+		{
+			cout << endl << "=======================================================================";
+			cout << endl << "		Reporte de Contrasenhas del Gerente			";
+			cout << endl << "-----------------------------------------------------------------------";
+			cout << endl << "                  Contrasenha    		";
+			cout << endl << "-----------------------------------------------------------------------";
+			fread(&reg, sizeof(reg), 1, ptr);
+			while (!feof(ptr))
+			{
+				if (reg.estado == 'S')
+				{
+					cout << endl << x << setw(25) << reg.contrasenha;
+					x++;
+				}
+				fread(&reg, sizeof(reg), 1, ptr);
+			}
+			cout << endl << "=======================================================================";
+			cout << "\n\nIngrese el nro de contrasenha a modificar :\n";
+			cin >> nro;
+			fseek(ptr, sizeof(reg)*(nro - 1), SEEK_SET);
+			fread(&reg, sizeof(reg), 1, ptr);
+			if (feof(ptr) != false)
+				cout << "\nEl registro no existe";
+			else
+			{
+				cout << "\nModificar la contrasenha?? Si = 1 -- No = 0 ";
+				cin >> op;
+				if (op == 1)
+				{
+
+					cout << "\nIngrese la nueva contrasenha:";
+					do
+					{
+						gets(reg.contrasenha);
+					} while (strlen(reg.contrasenha) == 0);
+
+				}
+
+
+				fseek(ptr, sizeof(reg)*(nro - 1), SEEK_SET);
+				fwrite(&reg, sizeof(reg), 1, ptr);
+			}
+			cout << "\nDesea modificar otra contrasenha del Gerente??? Si=1 -- No=0\n";
+			cin >> op;
+		} while (op == 1);
+	}
+	fclose(ptr);
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		subsubmenuSistemasContrasenhaGerente();
+	else
+		despedida();
+}
+
+/*void eliminarUsuario()
+{
+	system("CLS");
+	FILE *ptr;
+	usuario reg;
+	int nro, op;
+	ptr = fopen("usuario.dat", "r+b");
+	if (ptr == NULL)
+		cout << "\nEl Archivo no existe";
+	else
+	{
+		do
+		{
+			cout << "\nIngrese el nro de registro a Eliminar :\n";
+			cout << "\nOJO ====> EL archivo se borrara de forma permanente\n";
+			cin >> nro;
+			fseek(ptr, sizeof(reg)*(nro - 1), SEEK_SET);
+			fread(&reg, sizeof(reg), 1, ptr);
+			if (feof(ptr) != false)
+				cout << "\nEl registro no existe";
+			else
+			{
+				reg.estado = 'N';
+				fseek(ptr, sizeof(reg)*(nro - 1), SEEK_SET);
+				fwrite(&reg, sizeof(reg), 1, ptr);
+				cout << "\nEl registro ha sido eliminado!\n";
+			}
+			cout << "\nDesea modificar otro registro de un usuario??? Si=1 -- No=0\n";
+			cin >> op;
+		} while (op == 1);
+	}
+	fclose(ptr);
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		submenuSistemasProducto();
+	else
+		despedida();
+
+}
+*/
+void eliminarAlmacen()
+{
+	system("CLS");
+	FILE *ptr;
+	almacen reg;
+	int nro, op,x=1;
+	ptr = fopen("almacen.dat", "r+b");
+	if (ptr == NULL)
+		cout << "\nEl Archivo no existe";
+	else
+	{
+		do
+		{
+			cout << endl << "=======================================================================";
+			cout << endl << "		Reporte del Archivo Almacen			";
+			cout << endl << "-----------------------------------------------------------------------";
+			cout << endl << "    Codigo  		";
+			cout << endl << "-----------------------------------------------------------------------";
+			fread(&reg, sizeof(reg), 1, ptr);
+			while (!feof(ptr))
+			{
+				if (reg.estado == 'S')
+				{
+					cout << endl << x << setw(8) << reg.codigo;
+					x++;
+				}
+				fread(&reg, sizeof(reg), 1, ptr);
+			}
+			cout << endl << "=======================================================================";
+			cout << "\nIngrese el nro de registro a Eliminar:\n";
+			cout << "\nOJO ====> EL archivo se borrara de forma permanente\n";
+			cin >> nro;
+			fseek(ptr, sizeof(reg)*(nro - 1), SEEK_SET);
+			fread(&reg, sizeof(reg), 1, ptr);
+			if (feof(ptr) != false)
+				cout << "\nEl registro no existe";
+			else
+			{
+				reg.estado = 'N';
+				fseek(ptr, sizeof(reg)*(nro - 1), SEEK_SET);
+				fwrite(&reg, sizeof(reg), 1, ptr);
+				cout << "\nEl registro ha sido eliminado!\n";
+			}
+			cout << "\nDesea elimiar otro registro de almacen??? Si=1 -- No=0\n";
+			cin >> op;
+		} while (op == 1);
+	}
+	fclose(ptr);
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		submenuSistemasAlmacen();
+	else
+		despedida();
+
+}
+void eliminarUnidadDeNegocio()
+{
+	system("CLS");
+	FILE *ptr;
+	un reg;
+	int nro, op,x=1;
+	ptr = fopen("unidaddenegocio.dat", "r+b");
+	if (ptr == NULL)
+		cout << "\nEl Archivo no existe";
+	else
+	{
+		do
+		{
+			cout << endl << "=======================================================================";
+			cout << endl << "		Reporte del Archivo Unidad de Negocio			";
+			cout << endl << "-----------------------------------------------------------------------";
+			cout << endl << "  Codigo   Descripcion 		";
+			cout << endl << "-----------------------------------------------------------------------";
+			fread(&reg, sizeof(reg), 1, ptr);
+			while (!feof(ptr))
+			{
+				if (reg.estado == 'S')
+				{
+					cout << endl << x << setw(5) << reg.codigo << setw(12) << reg.descripcion;
+					x++;
+				}
+				fread(&reg, sizeof(reg), 1, ptr);
+			}
+			cout << endl << "=======================================================================";
+			cout << "\n\nIngrese el nro de registro a Eliminar:\n";
+			cout << "\nOJO ====> EL archivo se borrara de forma permanente\n";
+			cin >> nro;
+			fseek(ptr, sizeof(reg)*(nro - 1), SEEK_SET);
+			fread(&reg, sizeof(reg), 1, ptr);
+			if (feof(ptr) != false)
+				cout << "\nEl registro no existe";
+			else
+			{
+				reg.estado = 'N';
+				fseek(ptr, sizeof(reg)*(nro - 1), SEEK_SET);
+				fwrite(&reg, sizeof(reg), 1, ptr);
+				cout << "\nEl registro ha sido eliminado!\n";
+			}
+			cout << "\nDesea elimiar otro registro de unidad de negocio??? Si=1 -- No=0\n";
+			cin >> op;
+		} while (op == 1);
+	}
+	fclose(ptr);
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		submenuSistemasUnidadDeNegocio();
+	else
+		despedida();
+
+}
+void eliminarProducto()
+{
+	system("CLS");
+	FILE *ptr;
+	producto reg;
+	int nro, op,x=1;
+	ptr = fopen("producto.dat", "r+b");
+	if (ptr == NULL)
+		cout << "\nEl Archivo no existe";
+	else
+	{
+		do
+		{
+			cout << endl << "=======================================================================";
+			cout << endl << "		Reporte del Archivo Producto			";
+			cout << endl << "-----------------------------------------------------------------------";
+			cout << endl << "  Codigo  Descripcion	costo	Precio  Unidad de Negocio   Almacen		";
+			cout << endl << "-----------------------------------------------------------------------";
+			fread(&reg, sizeof(reg), 1, ptr);
+			while (!feof(ptr))
+			{
+				if (reg.estado == 'S')
+				{
+					cout << endl << x << setw(5) << reg.codigo << setw(14) << reg.descripcion << setw(8) << reg.costo << setw(8) << reg.precio << setw(10) << reg.un << setw(18) << reg.codigoalmacen;
+					x++;
+				}
+				fread(&reg, sizeof(reg), 1, ptr);
+			}
+			cout << endl << "=======================================================================";
+			cout << "\n\nIngrese el nro de registro a Eliminar:\n";
+			cout << "\nOJO ====> EL archivo se borrara de forma permanente\n";
+			cin >> nro;
+			fseek(ptr, sizeof(reg)*(nro - 1), SEEK_SET);
+			fread(&reg, sizeof(reg), 1, ptr);
+			if (feof(ptr) != false)
+				cout << "\nEl registro no existe";
+			else
+			{
+				reg.estado = 'N';
+				fseek(ptr, sizeof(reg)*(nro - 1), SEEK_SET);
+				fwrite(&reg, sizeof(reg), 1, ptr);
+				cout << "\nEl registro ha sido eliminado!\n";
+			}
+			cout << "\nDesea elimiar otro registro de un producto??? Si=1 -- No=0\n";
+			cin >> op;
+		} while (op == 1);
+	}
+	fclose(ptr);
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		submenuSistemasProducto();
+	else
+		despedida();
+
+}
+void eliminarVenta()
+{
+	system("CLS");
+	FILE *ptr;
+	venta reg;
+	int nro, op,x=1;
+	ptr = fopen("venta.dat", "r+b");
+	if (ptr == NULL)
+		cout << "\nEl Archivo no existe";
+	else
+	{
+		do
+		{
+			cout << endl << "=======================================================================";
+			cout << endl << "		Reporte del Archivo Venta			";
+			cout << endl << "-----------------------------------------------------------------------";
+			cout << endl << "  Cod. Prod  Cod. Alm 	Unidad de Negocio   Cantidad     Anho		";
+			cout << endl << "-----------------------------------------------------------------------";
+			fread(&reg, sizeof(reg), 1, ptr);
+			while (!feof(ptr))
+			{
+				if (reg.estado == 'S')
+				{
+					cout << endl << x << setw(5) << reg.codigoproducto << setw(14) << reg.codigoalmacen << setw(15) << reg.un << setw(15) << reg.cantidad << setw(11) << reg.fechaanho;
+					x++;
+				}
+				fread(&reg, sizeof(reg), 1, ptr);
+			}
+			cout << endl << "=======================================================================";
+			cout << "\n\nIngrese el nro de registro a Eliminar:\n";
+			cout << "\nOJO ====> EL archivo se borrara de forma permanente\n";
+			cin >> nro;
+			fseek(ptr, sizeof(reg)*(nro - 1), SEEK_SET);
+			fread(&reg, sizeof(reg), 1, ptr);
+			if (feof(ptr) != false)
+				cout << "\nEl registro no existe";
+			else
+			{
+				reg.estado = 'N';
+				fseek(ptr, sizeof(reg)*(nro - 1), SEEK_SET);
+				fwrite(&reg, sizeof(reg), 1, ptr);
+				cout << "\nEl registro ha sido eliminado!\n";
+			}
+			cout << "\nDesea elimiar otro registro de una venta??? Si=1 -- No=0\n";
+			cin >> op;
+		} while (op == 1);
+	}
+	fclose(ptr);
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		submenuSistemasProducto();
+	else
+		despedida();
+
+}
+void eliminarEncargadoDeVentaContrasenha()
+{
+	system("CLS");
+	FILE *ptr;
+	encargadodeventascontrasenha reg;
+	int nro, op,x=1;
+	ptr = fopen("encargadodeventacontrasenha.dat", "r+b");
+	if (ptr == NULL)
+		cout << "\nEl Archivo no existe";
+	else
+	{
+		do
+		{
+			cout << endl << "=======================================================================";
+			cout << endl << "		Reporte de Contrasenhas del Encargado de Ventas			";
+			cout << endl << "-----------------------------------------------------------------------";
+			cout << endl << "                  Contrasenha    		";
+			cout << endl << "-----------------------------------------------------------------------";
+			fread(&reg, sizeof(reg), 1, ptr);
+			while (!feof(ptr))
+			{
+				if (reg.estado == 'S')
+				{
+					cout << endl << x << setw(25) << reg.contrasenha;
+					x++;
+				}
+				fread(&reg, sizeof(reg), 1, ptr);
+			}
+			cout << endl << "=======================================================================";
+			cout << "\n\nIngrese el nro de registro a Eliminar:\n";
+			cout << "\nOJO ====> EL archivo se borrara de forma permanente\n";
+			cin >> nro;
+			fseek(ptr, sizeof(reg)*(nro - 1), SEEK_SET);
+			fread(&reg, sizeof(reg), 1, ptr);
+			if (feof(ptr) != false)
+				cout << "\nEl registro no existe";
+			else
+			{
+				reg.estado = 'N';
+				fseek(ptr, sizeof(reg)*(nro - 1), SEEK_SET);
+				fwrite(&reg, sizeof(reg), 1, ptr);
+				cout << "\nEl registro ha sido eliminado!\n";
+			}
+			cout << "\nDesea elimiar otra contrasenha del Encargado de Venta??? Si=1 -- No=0\n";
+			cin >> op;
+		} while (op == 1);
+	}
+	fclose(ptr);
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		subsubmenuSistemasContrasenhaEncargadoDeVenta();
+	else
+		despedida();
+
+}
+void eliminarGerenteContrasenha()
+{
+	system("CLS");
+	FILE *ptr;
+	gerentecontrasenha reg;
+	int nro, op,x=1;
+	ptr = fopen("gerentecontrasenha.dat", "r+b");
+	if (ptr == NULL)
+		cout << "\nEl Archivo no existe";
+	else
+	{
+		do
+		{
+			cout << endl << "=======================================================================";
+			cout << endl << "		Reporte de Contrasenhas del Gerente			";
+			cout << endl << "-----------------------------------------------------------------------";
+			cout << endl << "                  Contrasenha    		";
+			cout << endl << "-----------------------------------------------------------------------";
+			fread(&reg, sizeof(reg), 1, ptr);
+			while (!feof(ptr))
+			{
+				if (reg.estado == 'S')
+				{
+					cout << endl << x << setw(25) << reg.contrasenha;
+					x++;
+				}
+				fread(&reg, sizeof(reg), 1, ptr);
+			}
+			cout << endl << "=======================================================================";
+			cout << "\n\nIngrese el nro de registro a Eliminar:\n";
+			cout << "\nOJO ====> EL archivo se borrara de forma permanente\n";
+			cin >> nro;
+			fseek(ptr, sizeof(reg)*(nro - 1), SEEK_SET);
+			fread(&reg, sizeof(reg), 1, ptr);
+			if (feof(ptr) != false)
+				cout << "\nEl registro no existe";
+			else
+			{
+				reg.estado = 'N';
+				fseek(ptr, sizeof(reg)*(nro - 1), SEEK_SET);
+				fwrite(&reg, sizeof(reg), 1, ptr);
+				cout << "\nEl registro ha sido eliminado!\n";
+			}
+			cout << "\nDesea elimiar otra contrasenha del Gerente??? Si=1 -- No=0\n";
+			cin >> op;
+		} while (op == 1);
+	}
+	fclose(ptr);
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		subsubmenuSistemasContrasenhaGerente();
+	else
+		despedida();
+
+}
+
+void reporteProducto()
+{
+	system("CLS");
+	int op,x=1;
+	FILE *ptr;
+	producto reg;
+	ptr = fopen("producto.dat", "rb");
+	if (ptr == NULL)
+		cout << endl << "Archivo no Existe";
+	else
+	{
+		cout << endl << "=======================================================================";
+		cout << endl << "		Reporte del Archivo Producto			";
+		cout << endl << "-----------------------------------------------------------------------";
+		cout << endl << "  Codigo  Descripcion	costo	Precio  Unidad de Negocio  Almacen		";
+		cout << endl << "-----------------------------------------------------------------------";
+		fread(&reg, sizeof(reg), 1, ptr);
+		while (!feof(ptr))
+		{
+			if (reg.estado == 'S')
+			{
+				cout << endl << x << setw(5) << reg.codigo << setw(14) << reg.descripcion << setw(8) << reg.costo << setw(8) << reg.precio << setw(10) << reg.un << setw(18) << reg.codigoalmacen;
+				x++;
+			}
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		fclose(ptr);
+		cout << endl << "=======================================================================";
+	}
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		submenuSistemasProducto();
+	else
+		despedida();
+}
+void reporteAlmacen()
+{
+	system("CLS");
+	int op,x=1;
+	FILE *ptr;
+	almacen reg;
+	ptr = fopen("almacen.dat", "rb");
+	if (ptr == NULL)
+		cout << endl << "Archivo no Existe";
+	else
+	{
+		cout << endl << "=======================================================================";
+		cout << endl << "		Reporte del Archivo Almacen			";
+		cout << endl << "-----------------------------------------------------------------------";
+		cout << endl << "    Codigo  		";
+		cout << endl << "-----------------------------------------------------------------------";
+		fread(&reg, sizeof(reg), 1, ptr);
+		while (!feof(ptr))
+		{
+			if (reg.estado == 'S')
+			{
+				cout << endl << x << setw(8) << reg.codigo;
+				x++;
+			}
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		fclose(ptr);
+		cout << endl << "=======================================================================";
+	}
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		submenuSistemasAlmacen();
+	else
+		despedida();
+}
+void reporteUnidadDeNegocio()
+{
+	system("CLS");
+	int op,x=1;
+	FILE *ptr;
+	un reg;
+	ptr = fopen("unidaddenegocio.dat", "rb");
+	if (ptr == NULL)
+		cout << endl << "Archivo no Existe";
+	else
+	{
+		cout << endl << "=======================================================================";
+		cout << endl << "		Reporte del Archivo Unidad de Negocio			";
+		cout << endl << "-----------------------------------------------------------------------";
+		cout << endl << "  Codigo   Descripcion 		";
+		cout << endl << "-----------------------------------------------------------------------";
+		fread(&reg, sizeof(reg), 1, ptr);
+		while (!feof(ptr))
+		{
+			if (reg.estado == 'S')
+			{
+				cout << endl << x << setw(5) << reg.codigo << setw(12) << reg.descripcion;
+				x++;
+			}
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		fclose(ptr);
+		cout << endl << "=======================================================================";
+	}
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		submenuSistemasUnidadDeNegocio();
+	else
+		despedida();
+}
+/*void reporteUsuario()
+{
+	system("CLS");
+	int op,x=1;
+	FILE *ptr;
+	usuario reg;
+	ptr = fopen("usuario.dat", "rb");
+	if (ptr == NULL)
+		cout << endl << "Archivo no Existe";
+	else
+	{
+		cout << endl << "=======================================================================";
+		cout << endl << "		Reporte del Archivo Usuario			";
+		cout << endl << "-----------------------------------------------------------------------";
+		cout << endl << "  Codigo   Nombre       Contrasena 		";
+		cout << endl << "-----------------------------------------------------------------------";
+		fread(&reg, sizeof(reg), 1, ptr);
+		while (!feof(ptr))
+		{
+			if (reg.estado == 'S')
+			{
+				cout << endl << x << setw(5) << reg.nombre << setw(12) << reg.empresa << setw(15) << reg.contrasena;
+				x++;
+			}
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		fclose(ptr);
+		cout << endl << "=======================================================================";
+	}
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		submenuSistemasUsuario();
+	else
+		despedida();
+}
+*/
+void reporteVenta()
+{
+	system("CLS");
+	int op,x=1;
+	FILE *ptr;
+	venta reg;
+	ptr = fopen("venta.dat", "rb");
+	if (ptr == NULL)
+		cout << endl << "Archivo no Existe";
+	else
+	{
+		cout << endl << "=======================================================================";
+		cout << endl << "		Reporte del Archivo Venta			";
+		cout << endl << "-----------------------------------------------------------------------";
+		cout << endl << "  Cod. Prod  Cod. Alm 	Unidad de Negocio   Cantidad     Anho		";
+		cout << endl << "-----------------------------------------------------------------------";
+		fread(&reg, sizeof(reg), 1, ptr);
+		while (!feof(ptr))
+		{
+			if (reg.estado == 'S')
+			{
+				cout << endl << x << setw(5) << reg.codigoproducto << setw(14) << reg.codigoalmacen << setw(15) << reg.un << setw(15) << reg.cantidad << setw(11) << reg.fechaanho;
+				x++;
+			}
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		fclose(ptr);
+		cout << endl << "=======================================================================";
+	}
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		submenuSistemasVenta();
+	else
+		despedida();
+}
+void reporteEncargadoDeVentaContrasenha()
+{
+	system("CLS");
+	int op, x = 1;
+	FILE *ptr;
+	encargadodeventascontrasenha reg;
+	ptr = fopen("encargadodeventacontrasenha.dat", "rb");
+	if (ptr == NULL)
+		cout << endl << "Archivo no Existe";
+	else
+	{
+		cout << endl << "=======================================================================";
+		cout << endl << "		Reporte de Contrasenhas del Encargado de Ventas			";
+		cout << endl << "-----------------------------------------------------------------------";
+		cout << endl << "                  Contrasenha    		";
+		cout << endl << "-----------------------------------------------------------------------";
+		fread(&reg, sizeof(reg), 1, ptr);
+		while (!feof(ptr))
+		{
+			if (reg.estado == 'S')
+			{
+				cout << endl << x << setw(25) << reg.contrasenha;
+				x++;
+			}
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		fclose(ptr);
+		cout << endl << "=======================================================================";
+	}
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		subsubmenuSistemasContrasenhaEncargadoDeVenta();
+	else
+		despedida();
+}
+void reporteGerenteContrasenha()
+{
+	system("CLS");
+	int op, x = 1;
+	FILE *ptr;
+	gerentecontrasenha reg;
+	ptr = fopen("gerentecontrasenha.dat", "rb");
+	if (ptr == NULL)
+		cout << endl << "Archivo no Existe";
+	else
+	{
+		cout << endl << "=======================================================================";
+		cout << endl << "		Reporte de Contrasenhas del Gerente			";
+		cout << endl << "-----------------------------------------------------------------------";
+		cout << endl << "                  Contrasenha    		";
+		cout << endl << "-----------------------------------------------------------------------";
+		fread(&reg, sizeof(reg), 1, ptr);
+		while (!feof(ptr))
+		{
+			if (reg.estado == 'S')
+			{
+				cout << endl << x << setw(25) << reg.contrasenha;
+				x++;
+			}
+			fread(&reg, sizeof(reg), 1, ptr);
+		}
+		fclose(ptr);
+		cout << endl << "=======================================================================";
+	}
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		subsubmenuSistemasContrasenhaGerente();
+	else
+		despedida();
+}
+
+
+
+void submenuSistemasProducto()
+{
+	int op;
+	system("CLS");
+	do
+	{
+		
+		cout << "\n\tArchivo Producto";
+		cout << "\n\t----------------\n";
+		cout << "\n1.- Agregar";
+		cout << "\n2.- Modificar";
+		cout << "\n3.- Eliminar";
+		cout << "\n4.- Mostrar Reporte";
+		cout << "\n5.- Volver atras";
+		cout << "\n0.- Salir del Programa";
+		cout << "\n\nDigite una opcion:";
+		cin >> op;
+		switch (op)
+		{
+		case 1:	registrarProducto();
+				break;
+		case 2:	modificarProducto();
+				break;
+		case 3:	eliminarProducto();
+				break;
+		case 4:	reporteProducto();
+				break;
+		case 5:	menuSistemas();
+				break;
+		case 0:	despedida();
+				break;
+		}
+		if (op < 0 || op>5)
+			system("CLS");
+	} while (op<0||op>5);
+
+}
+void submenuSistemasAlmacen()
+{
+	int op;
+	system("CLS");
+	do
+	{
+
+		cout << "\n\tArchivo Almacen";
+		cout << "\n\t----------------\n";
+		cout << "\n1.- Agregar";
+		cout << "\n2.- Modificar";
+		cout << "\n3.- Eliminar";
+		cout << "\n4.- Mostrar Reporte";
+		cout << "\n5.- Volver atras";
+		cout << "\n0.- Salir del Programa";
+		cout << "\n\nDigite una opcion:";
+		cin >> op;
+		switch (op)
+		{
+		case 1:	registrarAlmacen();
+			break;
+		case 2:	modificarAlmacen();
+			break;
+		case 3:	eliminarAlmacen();
+			break;
+		case 4:	reporteAlmacen();
+			break;
+		case 5:	menuSistemas();
+			break;
+		case 0:	despedida();
+			break;
+		}
+		if (op < 0 || op>5)
+			system("CLS");
+	} while (op<0 || op>5);
+
+}
+void submenuSistemasUnidadDeNegocio()
+{
+	int op;
+	system("CLS");
+	do
+	{
+
+		cout << "\n\tArchivo Unidad de Negocio";
+		cout << "\n\t-------------------------\n";
+		cout << "\n1.- Agregar";
+		cout << "\n2.- Modificar";
+		cout << "\n3.- Eliminar";
+		cout << "\n4.- Mostrar Reporte";
+		cout << "\n5.- Volver atras";
+		cout << "\n0.- Salir del Programa";
+		cout << "\n\nDigite una opcion:";
+		cin >> op;
+		switch (op)
+		{
+		case 1:	registrarUnidadDeNegocio();
+			break;
+		case 2:	modificarUnidadDeNegocio();
+			break;
+		case 3:	eliminarUnidadDeNegocio();
+			break;
+		case 4:	reporteUnidadDeNegocio();
+			break;
+		case 5:	menuSistemas();
+			break;
+		case 0:	despedida();
+			break;
+		}
+		if (op < 0 || op>5)
+			system("CLS");
+	} while (op<0 || op>5);
+
+}
+/*void submenuSistemasUsuario()
+{
+	int op;
+	system("CLS");
+	do
+	{
+
+		cout << "\n\tArchivo Usuario";
+		cout << "\n\t---------------\n";
+		cout << "\n1.- Agregar";
+		cout << "\n2.- Modificar";
+		cout << "\n3.- Eliminar";
+		cout << "\n4.- Mostrar Reporte";
+		cout << "\n5.- Volver atras";
+		cout << "\n0.- Salir del Programa";
+		cout << "\n\nDigite una opcion:";
+		cin >> op;
+		switch (op)
+		{
+		case 1:	registrarUsuario();
+			break;
+		case 2:	modificarUsuario();
+			break;
+		case 3:	eliminarUsuario();
+			break;
+		case 4:	reporteUsuario();
+			break;
+		case 5:	menuSistemas();
+			break;
+		case 6:	despedida();
+			break;
+		}
+		if (op < 0 || op>6)
+			system("CLS");
+	} while (op<0 || op>6);
+
+}
+*/
+void submenuSistemasVenta()
+{
+	int op;
+	system("CLS");
+	do
+	{
+
+		cout << "\n\tArchivo Venta";
+		cout << "\n\t----------------\n";
+		cout << "\n1.- Agregar";
+		cout << "\n2.- Modificar";
+		cout << "\n3.- Eliminar";
+		cout << "\n4.- Mostrar Reporte";
+		cout << "\n5.- Volver atras";
+		cout << "\n0.- Salir del Programa";
+		cout << "\n\nDigite una opcion:";
+		cin >> op;
+		switch (op)
+		{
+		case 1:	registrarVenta();
+			break;
+		case 2:	modificarVenta();
+			break;
+		case 3:	eliminarVenta();
+			break;
+		case 4:	reporteVenta();
+			break;
+		case 5:	menuSistemas();
+			break;
+		case 0:	despedida();
+			break;
+		}
+		if (op < 0 || op>5)
+			system("CLS");
+	} while (op<0 || op>5);
+
+}
+
+void subsubmenuSistemasContrasenhaEncargadoDeVenta()
+{
+	int nro, op;
+	system("CLS");
+	do
+	{
+
+		cout << "\n\tMenu de Contrasenhas del Encargado de Ventas";
+		cout << "\n\t-------------------------------------------\n";
+		cout << "\n1.- Adicionar";
+		cout << "\n2.- Mostrar lista";
+		cout << "\n3.- Modificar";
+		cout << "\n4.- Eliminar";
+		cout << "\n5.- Volver atras";
+		cout << "\n0.- Salir del programa";
+		cout << "\n\nDigite una opcion:";
+		cin >> op;
+		switch (op)
+		{
+		case 1:		registrarEncargadoDeVentaContrasenha();
+					break;
+		case 2:		reporteEncargadoDeVentaContrasenha();
+					break;
+		case 3:		modificarEncargadoDeVentaContrasenha();
+					break;
+		case 4:		eliminarEncargadoDeVentaContrasenha();
+					break;
+		case 5:		menuSistemas();
+					break;
+		case 0:		despedida();
+					break;
+		}
+		if (op < 0 || op>5)
+			system("CLS");
+	} while (op < 0 || op>5);
+
+}
+void subsubmenuSistemasContrasenhaGerente()
+{
+	int nro, op;
+	system("CLS");
+	do
+	{
+
+		cout << "\n\tMenu de Contrasenhas del Gerente";
+		cout << "\n\t--------------------------------\n";
+		cout << "\n1.- Adicionar";
+		cout << "\n2.- Mostrar lista";
+		cout << "\n3.- Modificar";
+		cout << "\n4.- Eliminar";
+		cout << "\n5.- Volver atras";
+		cout << "\n0.- Salir del programa";
+		cout << "\n\nDigite una opcion:";
+		cin >> op;
+		switch (op)
+		{
+		case 1:		registrarGerenteContrasenha();
+					break;
+		case 2:		reporteGerenteContrasenha();
+					break;
+		case 3:		modificarGerenteContrasenha();
+					break;
+		case 4:		eliminarGerenteContrasenha();
+					break;
+		case 5:		menuSistemas();
+					break;
+		case 0:		despedida();
+					break;
+		}
+		if (op < 0 || op>5)
+			system("CLS");
+	} while (op < 0 || op>5);
+
+}
+
+
+void submenuEncargadoDeVentasRegistrar()
+{
+	system("CLS");
+	FILE *ptr;
+	venta reg;
+	producto regP;
+	int op;
+	bool k = false,l=false, m=false;
+	ptr = fopen("venta.dat","ab");
+	do
+	{
+		cout << "\n\tRegristrar Venta";
+		cout << "\n\t----------------\n";
+		cout << "\nIngrese el codigo del producto: ";
+		do
+		{
+			cin >> reg.codigoproducto;
+			if (verificarCodigoProducto(reg.codigoproducto) == false)
+				cout << "\n\nEl codigo es Incorrecto\nDigite el Codigo del Producto de Nuevo:";
+			else
+				k = true;
+		} while (k==false);
+		regP = ObtCodigoProducto(reg.codigoproducto);
+		reg.ventaacumulada = reg.cantidad*regP.precio;
+		cout << "\nIngrese codigo del almacen: ";
+		do
+		{
+			cin >> reg.codigoalmacen;
+			if (verificarCodigoAlmacen(reg.codigoalmacen) == false)
+				cout << "\n\nEl codigo es Incorrecto\nDigite el Codigo del Almacen de Nuevo:";
+			else
+				l = true;
+		} while (l==false);
+		
+		cout << "\nIngrese la unidad de negocio: ";
+		do
+		{
+			do
+			{
+				gets(reg.un);
+			} while (strlen(reg.un)==0);
+			if (verificarUnidadDeNegocio(reg.un) == false)
+				cout << "\n\nLa Unidad de Negocio es Incorrecta\nDigite la Unidad de Negocio de Nuevo:";
+			else
+				m = true;
+		} while (m == false);
+		
+		cout << "\nIngrese la cantidad: ";
+		do
+		{
+			cin >> reg.cantidad;
+		} while (reg.cantidad<0);
+		
+		cout << "\nIngrese el Anho de la Venta: ";
+		do
+		{
+			cin >> reg.fechaanho;
+		} while (reg.fechaanho<0);
+		reg.estado = 'S';
+		fwrite(&reg, sizeof(reg), 1, ptr);
+		cout << "Adicionar otra venta acumulada:" << endl << "si=1" << "\nno=0\n";
+		cin >> op;
+	} while (op == 1);
+	fclose(ptr);
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		menuEncargadoDeVentas();
+	else
+		despedida();
+
+
+}
+
+void submenuEncargadoDeVentasBuscarProducto()
+{
+	system("CLS");
+	FILE *ptr;
+	producto regP;
+	int op,codigo;
+	bool k = false;
+	do
+	{
+		cout << "\n\tBuscador por Codigo de Producto";
+		cout << "\n\t-------------------------------\n";
+		cout << "\nIngrese el codigo del producto: ";
+		do
+		{
+			cin >> codigo;
+			if (verificarCodigoProducto(codigo) == false)
+				cout << "\n\nEl codigo es Incorrecto\nDigite el Codigo del Producto de Nuevo:";
+			else
+				k = true;
+		} while (k == false);
+		cout << "\n\nSe ha encontrado el producto!!";
+		getch();
+		regP = ObtCodigoProducto(codigo);
+		system("CLS");
+		cout << endl << "=======================================================================";
+		cout << endl << "		Reporte del Buscador por Codigo de Producto			";
+		cout << endl << "-----------------------------------------------------------------------";
+		cout << endl << "  Codigo  Descripcion		Precio    Almacen		";
+		cout << endl << "-----------------------------------------------------------------------";
+			if (regP.estado == 'S')
+			{
+				cout << endl << setw(5) << regP.codigo << setw(14) << regP.descripcion << setw(17) << regP.precio << setw(11) << regP.codigoalmacen;
+			}
+		
+		cout << endl << "=======================================================================";
+		
+		cout << "\n\nBuscar otro producto?:" << endl << "si=1" << "\nno=0\n";
+		cin >> op;
+	} while (op == 1);
+	cout << "\nDesea volver atras?? si = 1 ---  Salir = 0\n";
+	cin >> op;
+	if (op == 1)
+		menuEncargadoDeVentas();
+	else
+		despedida();
+
+
+}
+
+void ingresarEncargadoDeVenta()
+{
+	int nro, op;
+	bool k = false;
+	char contrasenha[max];
+	system("CLS");
+		cout << "\n\tVerificacion del Usuario: Encargado de Ventas";
+		cout << "\n\t---------------------------------------------\n";
+		cout << "\n\n\tContrasenha: ";
+		do
+		{
+			do
+			{
+				gets(contrasenha);
+			} while (strlen(contrasenha)==0);
+			if (verificarEncargadoDeVentaContrasenha(contrasenha) == false)
+				cout << "\n\nLa contrasenha es Incorrecta\n\nDigite la Contrasenha de Nuevo:";
+			else
+			{
+				k = true;
+				cout << "\n\nLa contrasenha es Correcta\n\nBienvenido Encargado de Venta!!";
+				getch();
+				menuEncargadoDeVentas();
+			}
+		} while (k == false);
+		
+		
+}
+void ingresarGerente()
+{
+	int nro, op;
+	bool k = false;
+	char contrasenha[max];
+	system("CLS");
+	cout << "\n\tVerificacion del Usuario: Gerente";
+	cout << "\n\t---------------------------------\n";
+	cout << "\n\n\tContrasenha: ";
+	do
+	{
+		do
+		{
+			gets(contrasenha);
+		} while (strlen(contrasenha)==0);
+		if (verificarGerenteContrasenha(contrasenha) == false)
+			cout << "\n\nLa contrasenha es Incorrecta\nDigite la Contrasenha de Nuevo:";
+		else
+		{
+			k = true;
+			cout << "\n\nLa contrasenha es Correcta\n\nBienvenido Gerente!!";
+			getch();
+			menuGerente();
+		}
+	} while (k == false);
+	
+
+}
+void ingresarSistemas()
+{
+	int nro, op;
+	bool k = false;
+	char contrasenha[max],micodigo[max];
+	system("CLS");
+	strcpy(micodigo,"jose");
+	cout << "\n\tVerificacion del Usuario: SISTEMAS!";
+	cout << "\n\t-----------------------------------\n";
+	cout << "\n\n\tContrasenha: ";
+	do
+	{
+		do
+		{
+			gets(contrasenha);
+		} while (strlen(contrasenha) == 0);
+		if (strcmp(contrasenha,micodigo)!=0)
+			cout << "\n\nLa contrasenha es Incorrecta\nDigite la Contrasenha de Nuevo:";
+		else
+		{
+			k = true;
+			cout << "\n\nLa contrasenha es Correcta\n\nBienvenido SISTEMAS!!";
+			getch();
+			menuSistemas();
+		}
+	} while (k == false);
+
+
+}
+
+void menuSistemas()
+{
+	int nro, op;
+	system("CLS");
+	do
+	{
+		
+		cout << "\n\tMenu de Sistema";
+		cout << "\n\t---------------\n";
+		cout << "\n1.- Crear Archivos";
+		cout << "\n2.- Archivo Producto";
+		cout << "\n3.- Archivo Almacen";
+		cout << "\n4.- Archivo Unidad de Negocio";
+		cout << "\n5.- Archivo Venta";
+		cout << "\n6.- Contrasenha Encargado de Ventas";
+		cout << "\n7.- Contrasenha Gerente";
+		cout << "\n8.- Volver atras";
+		cout << "\n0.- Salir del programa";
+		cout << "\n\nDigite una opcion:";
+		cin >> op;
+		switch (op)
+		{
+		case 1:		creararchivoProducto();
+					creararchivoAlmacen();
+					creararchivoUnidaddeNegocio();
+					//creararchivoUsuario();
+					creararchivoVenta();
+					creararchivoEncargadoDeVentaContraseña();
+					creararchivoGerenteContraseña();
+					cout << "\n\nLos Archivos han sido creados";
+					getch();
+					menuSistemas();
+					break;
+		case 2:		submenuSistemasProducto();
+					break;
+		case 3:		submenuSistemasAlmacen();
+					break;
+		case 4:		submenuSistemasUnidadDeNegocio();
+					break;
+		case 5:		submenuSistemasVenta();
+					break;
+		case 6:		subsubmenuSistemasContrasenhaEncargadoDeVenta();
+					break;
+		case 7:		subsubmenuSistemasContrasenhaGerente();
+					break;
+		case 8:		Bienvenido();
+					break;
+		case 0:		despedida();
+					break;
+		}
+		if (op < 0 || op>8)
+			system("CLS");
+	} while (op < 0 || op>8);
+}
+void menuEncargadoDeVentas()
+{
+	int nro, op;
+	system("CLS");
+	do
+	{
+
+		cout << "\n\tMenu del Encargado de Ventas";
+		cout << "\n\t----------------------------\n";
+		cout << "\n1.- Registrar Datos";
+		cout << "\n2.- Buscar Producto";
+		cout << "\n3.- Volver atras";
+		cout << "\n0.- Salir del programa";
+		cout << "\n\nDigite una opcion:";
+		cin >> op;
+		switch (op)
+		{
+		case 1:		submenuEncargadoDeVentasRegistrar();
+					break;
+		case 2:		submenuEncargadoDeVentasBuscarProducto();
+					break;
+		case 3:		Bienvenido();
+					break;
+		case 0:		despedida();
+					break;
+		}
+		if (op < 0 || op>3)
+			system("CLS");
+	} while (op < 0 || op>3);
+}
+void menuGerente()
+{
+	int nro, op, c, d, e;
+	system("CLS");
+	do
+	{
+
+		cout << "\n\tMenu del Gerente";
+		cout << "\n\t----------------\n";
+		cout << "\n1.- Listas de Venta Acumulada por Anho";
+		cout << "\n2.- Calcular Pronostico de Ventas";
+		cout << "\n3.- Mostrar Pronostico de Ventas";
+		cout << "\n4.- Porcentaje por Periodo";
+		cout << "\n5.- Volver atras";
+		cout << "\n0.- Salir del programa";
+		cout << "\n\nDigite una opcion:";
+		cin >> op;
+		switch (op)
+		{
+		case 1:		mostrarListaDeVentasAcumuladas();
+					break;
+		case 2:		creararchivoProyeccion();
+					c = mostrarListaDeVentasAcumuladasA();
+					proyeccion(calculoProyeccionA(), calculoProyeccionB(), c);
+					cout << "\n\nEl calculo ya fue ejecutado";
+					getch();
+					system("CLS");
+					menuGerente();
+					break;
+		case 3:		c = mostrarListaDeVentasAcumuladasA();
+					reportePronostico(c);
+					break;
+		case 4:		porcentaje(calculoPorcentajeB(), calculoPorcentajeMay(), calculoPorcentajeSumy());
+					break;
+		case 5:		Bienvenido();
+					break;
+		case 0:		despedida();
+					break;
+		}
+		if (op < 0 || op>5)
+			system("CLS");
+	} while (op < 0 || op>5);
+}
+
+void despedida()
+{
+	system("CLS");
+	system("color 0f");
+	cout << endl << "   ===========================================================================";
+	cout << endl << setw(70) << "      ** Proyecto Intensivo de Algoritmos y Programacion I ** ";
+	cout << endl << "   ---------------------------------------------------------------------------";
+	cout << endl << "	  \n		Integrantes:";
+	cout << endl << endl << "			    --> Close Andre   ";
+	cout << endl << "			    --> Rodriguez Andrea ";
+	cout << endl << "			    --> Terceros Nathaly  ";
+	cout << endl << "\n			   Santa Cruz - Bolivia";
+	cout << endl << "   ===========================================================================";
+	getch();
+}
+void Bienvenido()
+{
+	int opcion;
+	do
+	{
+		system("CLS");
+		cout << "\n\n\tBienvenido al Programa de Proyeccion de Presupuestos de Ventas";
+		cout << "\n\nEste programa le ayudara a identificar los costos asociados\ncon el funcionamiento de su negocio sobre una base anual.\nLas proyecciones presupuestarias tambien ayudan a gestionar\nadecuadamente los ingresos para alcanzar los objetivos\nestrategicos de su empresa.";
+		cout << "\n\nSeleccione el tipo de usuario como el que desea entrar: ";
+		cout << "\n";
+		cout << "\n1.- Encargado de Ventas";
+		cout << "\n2.- Gerente";
+		cout << "\n3.- Encargado de Sistemas";
+		cout << "\n0.- Salir del Programa";
+		cout << "\nSeleccione una opcion: ";
+		cin >> opcion;
+		switch (opcion)
+		{
+		case 1:		ingresarEncargadoDeVenta();
+					break;
+		case 2:		ingresarGerente();
+					break;
+		case 3:		ingresarSistemas();
+					break;
+		case 0:		despedida();
+					break;
+		}
+		if (opcion < 0 || opcion>3)
+			system("CLS");
+	} while (opcion < 0 || opcion>3);
+	
+}
+
+
+
+void main()
+{
+	int opcion;
+	Bienvenido();
+	getch();
+}
